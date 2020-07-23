@@ -2,6 +2,7 @@ package com.example.room_exam;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
 import android.os.Bundle;
@@ -24,18 +25,17 @@ public class MainActivity extends AppCompatActivity {
         mTodoEditText = findViewById(R.id.todo_edit);
         mResultTextView = findViewById(R.id.result_text);
 
-        final AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "todo-db")
-                .allowMainThreadQueries()
-                .build();
+        MainViewModel viewModel = new ViewModelProvider(this,
+                new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(MainViewModel.class);
 
         // UI 갱신 -> LiveData
-        db.todoDao().getAll().observe(this, todos -> {
+        viewModel.getAll().observe(this, todos -> {
             mResultTextView.setText(todos.toString());
         });
 
         // 버튼 클릭 시 DB 에 insert
         findViewById(R.id.add_button).setOnClickListener(v -> {
-            db.todoDao().insert(new Todo(mTodoEditText.getText().toString()));
+            viewModel.insert(new Todo(mTodoEditText.getText().toString()));
         });
     }
 }
